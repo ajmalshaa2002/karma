@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVARA — Digital Agency | Web, Marketing, SEO &amp; Real Estate Growth</title>
+<meta name="description" content="NOVARA is a premium digital agency offering web development, digital marketing, SEO, branding, lead generation and real estate marketing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+<style>
+  :root{
+    --black:#000000; --white:#ffffff;
+    --g05:#0a0a0a; --g10:#111111; --g15:#1a1a1a; --g20:#222222;
+    --g30:#333333; --g40:#4a4a4a; --g50:#666666; --g60:#888888;
+    --g70:#aaaaaa; --g80:#cccccc; --g90:#e5e5e5;
+    --glow: 0 0 40px rgba(255,255,255,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{background:var(--black); color:var(--white); overflow-x:hidden; cursor:none;}
+  body{font-family:'Inter',sans-serif; font-weight:400;}
+  h1,h2,h3,h4,.display{font-family:'Poppins',sans-serif;}
+  ::selection{background:#fff; color:#000;}
+  ::-webkit-scrollbar{width:6px;}
+  ::-webkit-scrollbar-track{background:#000;}
+  ::-webkit-scrollbar-thumb{background:#333; border-radius:10px;}
+  a, button{cursor:none;}
+
+  /* noise texture */
+  .noise{position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* custom cursor */
+  #cursor-dot{position:fixed; width:6px; height:6px; background:#fff; border-radius:50%; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); transition:opacity .2s, width .2s, height .2s; box-shadow:0 0 8px rgba(255,255,255,.9);}
+  #cursor-dot.click{width:10px; height:10px;}
+  #cursor-ring{position:fixed; width:36px; height:36px; border:1px solid rgba(255,255,255,.5); border-radius:50%; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); transition:width .25s,height .25s,border-color .25s,background .25s; }
+  .cursor-hover #cursor-dot{width:4px; height:4px;}
+  #cursor-glow{position:fixed; width:380px; height:380px; border-radius:50%; pointer-events:none; z-index:1; transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%); transition:opacity .3s;}
+  .cursor-hover #cursor-ring{width:64px; height:64px; background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.9);}
+
+  #webgl-bg{position:fixed; inset:0; z-index:0;}
+
+  .glass{background:rgba(255,255,255,0.03); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.08);}
+  .glass-strong{background:rgba(255,255,255,0.06); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.12);}
+
+  .grain-text{background:linear-gradient(180deg,#fff 0%, #999 100%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+  .magnetic-btn{position:relative; overflow:hidden; transition:transform .25s ease;}
+  .magnetic-btn .fill{position:absolute; inset:0; background:#fff; transform:translateY(101%); transition:transform .45s cubic-bezier(.16,1,.3,1); z-index:0;}
+  .magnetic-btn:hover .fill{transform:translateY(0);}
+  .magnetic-btn .label{position:relative; z-index:1; transition:color .35s ease;}
+  .magnetic-btn:hover .label{color:#000;}
+
+  .nav-link{position:relative;}
+  .nav-link::after{content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px; background:#fff; transition:width .3s ease;}
+  .nav-link:hover::after{width:100%;}
+
+  .service-card, .portfolio-card, .team-card{transition:transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s ease, border-color .4s ease;}
+  .tilt-wrap{transform-style:preserve-3d; perspective:1000px;}
+
+  .reveal{opacity:0; transform:translateY(60px);}
+
+  .marquee{display:flex; white-space:nowrap; animation:marquee 28s linear infinite;}
+  @keyframes marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  .progress-bar{position:fixed; top:0; left:0; height:2px; background:#fff; z-index:9998; width:0%; box-shadow:0 0 10px #fff;}
+
+  #loader{position:fixed; inset:0; background:#000; z-index:99999; display:flex; align-items:center; justify-content:center; flex-direction:column;}
+  .loader-line{width:1px; height:60px; background:linear-gradient(#fff, transparent); position:absolute;}
+
+  .accordion-content{max-height:0; overflow:hidden; transition:max-height .5s cubic-bezier(.16,1,.3,1);}
+
+  .wa-float{position:fixed; bottom:28px; right:28px; z-index:60;}
+
+  input::placeholder, textarea::placeholder{color:#666;}
+  input, textarea{background:rgba(255,255,255,0.03);}
+
+  .btt{position:fixed; bottom:28px; left:28px; z-index:60; opacity:0; pointer-events:none; transition:opacity .4s ease;}
+  .btt.show{opacity:1; pointer-events:auto;}
+
+  .cookie{position:fixed; bottom:0; left:0; right:0; z-index:9997; transform:translateY(120%); transition:transform .6s cubic-bezier(.16,1,.3,1);}
+  .cookie.show{transform:translateY(0);}
+
+  .section-bg{position:absolute; inset:0; z-index:-1; background-size:cover; background-position:center; filter:grayscale(1) contrast(1.1) brightness(.35); opacity:.35;}
+  .section-bg::after{content:''; position:absolute; inset:0; background:linear-gradient(180deg, #000 0%, rgba(0,0,0,.7) 15%, rgba(0,0,0,.85) 85%, #000 100%);}
+  .section-relative{position:relative; overflow:hidden;}
+    #cursor-dot,#cursor-ring,#cursor-glow{display:none;}
+    *, body, a, button{cursor:auto;}
+  
+</style>
+</head>
+<body class="antialiased">
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="overflow-hidden">
+    <h1 id="loader-text" class="text-[12vw] md:text-[7vw] font-extrabold tracking-tight grain-text" style="transform:translateY(110%)">NOVARA</h1>
+  </div>
+  <p class="text-xs tracking-[0.4em] text-gray-500 mt-4 uppercase" id="loader-pct">Loading 0%</p>
+</div>
+
+<div class="noise"></div>
+<div id="cursor-glow"></div>
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<div class="progress-bar" id="progressBar"></div>
+<canvas id="webgl-bg"></canvas>
+
+<!-- NAV -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between py-5">
+    <a href="#home" class="text-xl font-bold tracking-[0.15em] data-magnetic">NOVARA<span class="text-gray-500">.</span></a>
+    <nav class="hidden lg:flex items-center gap-9 text-sm text-gray-300">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#portfolio" class="nav-link">Portfolio</a>
+      <a href="#process" class="nav-link">Process</a>
+      <a href="#team" class="nav-link">Team</a>
+      <a href="#testimonials" class="nav-link">Testimonials</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+    <a href="#contact" class="magnetic-btn hidden md:inline-flex items-center border border-white/30 rounded-full px-6 py-2.5 text-sm">
+      <span class="fill"></span><span class="label">Let's Talk</span>
+    </a>
+    <button id="menuBtn" class="lg:hidden text-white"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  </div>
+  <div id="mobileMenu" class="lg:hidden hidden flex-col gap-6 px-8 py-8 glass-strong text-lg">
+    <a href="#home" class="mob-link">Home</a>
+    <a href="#about" class="mob-link">About</a>
+    <a href="#services" class="mob-link">Services</a>
+    <a href="#portfolio" class="mob-link">Portfolio</a>
+    <a href="#process" class="mob-link">Process</a>
+    <a href="#team" class="mob-link">Team</a>
+    <a href="#testimonials" class="mob-link">Testimonials</a>
+    <a href="#faq" class="mob-link">FAQ</a>
+    <a href="#contact" class="mob-link">Contact</a>
+  </div>
+</header>
+
+<main class="relative z-10">
+
+  <!-- HERO -->
+  <section id="home" class="relative min-h-[100vh] flex flex-col items-center justify-center px-6 text-center overflow-hidden">
+    <p class="reveal text-xs md:text-sm tracking-[0.4em] text-gray-400 uppercase mb-6">Premium Web &amp; Growth Agency</p>
+    <h1 class="reveal text-[12vw] md:text-[6.2vw] leading-[0.95] font-extrabold tracking-tight grain-text max-w-6xl">
+      Building Digital Experiences<br/>That Drive Growth
+    </h1>
+    <p class="reveal text-base md:text-lg text-gray-400 max-w-xl mt-8 leading-relaxed">
+      We design premium websites and powerful digital marketing strategies that help businesses stand out and generate more customers.
+    </p>
+    <div class="reveal flex flex-col sm:flex-row gap-4 mt-10">
+      <a href="#contact" class="magnetic-btn rounded-full px-8 py-4 border border-white text-sm font-medium tracking-wide">
+        <span class="fill"></span><span class="label">Start Your Project</span>
+      </a>
+      <a href="#portfolio" class="magnetic-btn rounded-full px-8 py-4 border border-white/25 text-sm font-medium tracking-wide">
+        <span class="fill"></span><span class="label">View Portfolio</span>
+      </a>
+    </div>
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500">
+      <span class="text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+      <div class="w-[1px] h-10 bg-gradient-to-b from-white/60 to-transparent"></div>
+    </div>
+  </section>
+
+  <!-- CLIENT LOGOS MARQUEE -->
+  <section class="border-y border-white/10 py-7 overflow-hidden">
+    <div class="marquee text-gray-600 text-2xl font-semibold tracking-widest gap-16 px-8">
+      <span class="mx-8">ORBIT&nbsp;CO.</span><span class="mx-8">VERTEX</span><span class="mx-8">HALCYON</span><span class="mx-8">MERIDIAN</span><span class="mx-8">NORTHWELL</span><span class="mx-8">ATLAS GROUP</span><span class="mx-8">PRIMEROOT</span>
+      <span class="mx-8">ORBIT&nbsp;CO.</span><span class="mx-8">VERTEX</span><span class="mx-8">HALCYON</span><span class="mx-8">MERIDIAN</span><span class="mx-8">NORTHWELL</span><span class="mx-8">ATLAS GROUP</span><span class="mx-8">PRIMEROOT</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section-relative py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=60');"></div>
+    <div class="grid md:grid-cols-12 gap-12">
+      <div class="md:col-span-5 reveal">
+        <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">About Novara</p>
+        <h2 class="text-4xl md:text-5xl font-bold leading-tight">We exist to make great businesses <span class="text-gray-500">impossible to ignore.</span></h2>
+      </div>
+      <div class="md:col-span-7 flex flex-col gap-6 text-gray-400 text-lg leading-relaxed reveal">
+        <p>Novara was founded on a simple belief: most businesses don't lose to better competitors — they lose to better-marketed ones. We started as a two-person team obsessed with the intersection of design, code and conversion, and grew into a full-stack digital partner for ambitious brands.</p>
+        <p>Today we combine modern web technology with data-driven marketing to help our clients win attention, build trust and turn visitors into paying customers. Every project we take on is treated as if it were our own business — because your growth is our scoreboard.</p>
+        <div class="grid grid-cols-2 gap-6 mt-4">
+          <div class="glass rounded-2xl p-6">
+            <h4 class="font-semibold text-white mb-1">Our Mission</h4>
+            <p class="text-sm text-gray-500">Help businesses grow through modern web technology and performance-driven marketing.</p>
+          </div>
+          <div class="glass rounded-2xl p-6">
+            <h4 class="font-semibold text-white mb-1">Our Approach</h4>
+            <p class="text-sm text-gray-500">Strategy first, design second, code third — every decision tied to a business outcome.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="py-20 border-y border-white/10 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+      <div class="reveal"><h3 class="text-5xl font-extrabold counter" data-target="100">0</h3><p class="text-gray-500 text-sm mt-2 tracking-wide uppercase">+ Projects Completed</p></div>
+      <div class="reveal"><h3 class="text-5xl font-extrabold counter" data-target="50">0</h3><p class="text-gray-500 text-sm mt-2 tracking-wide uppercase">+ Happy Clients</p></div>
+      <div class="reveal"><h3 class="text-5xl font-extrabold"><span class="counter" data-target="99">0</span>%</h3><p class="text-gray-500 text-sm mt-2 tracking-wide uppercase">Client Satisfaction</p></div>
+      <div class="reveal"><h3 class="text-5xl font-extrabold">24/7</h3><p class="text-gray-500 text-sm mt-2 tracking-wide uppercase">Support</p></div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="section-relative py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&q=60');"></div>
+    <div class="text-center mb-16 reveal">
+      <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">What We Do</p>
+      <h2 class="text-4xl md:text-5xl font-bold">Full-Stack Growth, Under One Roof</h2>
+    </div>
+    <div id="servicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- injected by JS -->
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio" class="section-relative py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=60');"></div>
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-6 reveal">
+      <div>
+        <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">Selected Work</p>
+        <h2 class="text-4xl md:text-5xl font-bold">Portfolio</h2>
+      </div>
+      <div id="filterBar" class="flex flex-wrap gap-2">
+        <button class="filter-btn active px-4 py-2 rounded-full text-xs border border-white/20" data-filter="all">All</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Business">Business</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="E-commerce">E-commerce</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Restaurant">Restaurant</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Healthcare">Healthcare</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Real Estate">Real Estate</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Portfolio">Portfolio</button>
+        <button class="filter-btn px-4 py-2 rounded-full text-xs border border-white/20" data-filter="Landing">Landing Pages</button>
+      </div>
+    </div>
+    <div id="portfolioGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" class="section-relative py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600&q=60');"></div>
+    <div class="text-center mb-20 reveal">
+      <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">How We Work</p>
+      <h2 class="text-4xl md:text-5xl font-bold">Our Process</h2>
+    </div>
+    <div class="relative">
+      <div class="hidden md:block absolute left-0 top-6 h-[2px] bg-white/10 w-full"></div>
+      <div id="processLine" class="hidden md:block absolute left-0 top-6 h-[2px] bg-white w-0 shadow-[0_0_10px_white]"></div>
+      <div class="grid grid-cols-2 md:grid-cols-7 gap-y-12 gap-x-4">
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Discovery</h4><p class="text-xs text-gray-500">Understand goals &amp; audience</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Planning</h4><p class="text-xs text-gray-500">Strategy &amp; roadmap</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Design</h4><p class="text-xs text-gray-500">UI/UX &amp; branding</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Development</h4><p class="text-xs text-gray-500">Build &amp; integrate</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Testing</h4><p class="text-xs text-gray-500">QA &amp; performance</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Launch</h4><p class="text-xs text-gray-500">Go live with confidence</p>
+        </div>
+        <div class="process-step reveal flex flex-col items-center text-center gap-4">
+          <div class="w-3 h-3 rounded-full bg-white relative z-10"></div>
+          <h4 class="font-semibold text-sm">Support</h4><p class="text-xs text-gray-500">Maintain &amp; optimize</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="team" class="py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">The People</p>
+      <h2 class="text-4xl md:text-5xl font-bold">Meet The Team</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 max-w-3xl mx-auto gap-8">
+      <div class="team-card reveal glass rounded-3xl p-8 text-center hover:-translate-y-2">
+        <div class="w-28 h-28 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold border border-white/20" style="background:linear-gradient(160deg,#222,#000);">AJ</div>
+        <h3 class="text-xl font-semibold">Ajmal</h3>
+        <p class="text-gray-500 text-sm mt-1">Full Stack Web Developer &amp; Digital Marketer</p>
+        <p class="text-gray-400 text-sm mt-4 leading-relaxed">Builds fast, scalable websites and applications, then drives traffic to them through performance marketing.</p>
+        <div class="flex justify-center gap-4 mt-5 text-gray-400">
+          <a href="#" class="hover:text-white">LinkedIn</a><a href="#" class="hover:text-white">Twitter</a>
+        </div>
+      </div>
+      <div class="team-card reveal glass rounded-3xl p-8 text-center hover:-translate-y-2">
+        <div class="w-28 h-28 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold border border-white/20" style="background:linear-gradient(160deg,#222,#000);">SK</div>
+        <h3 class="text-xl font-semibold">Sarah Khan</h3>
+        <p class="text-gray-500 text-sm mt-1">Digital Marketer &amp; Real Estate Marketing Specialist</p>
+        <p class="text-gray-400 text-sm mt-4 leading-relaxed">Specialises in property campaigns, lead generation funnels and converting attention into qualified buyers.</p>
+        <div class="flex justify-center gap-4 mt-5 text-gray-400">
+          <a href="#" class="hover:text-white">LinkedIn</a><a href="#" class="hover:text-white">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <p class="text-center text-xs text-gray-600 mt-6">* Replace "Sarah Khan" / "SK" with your friend's real name &amp; initials.</p>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="py-32 overflow-hidden">
+    <div class="text-center mb-16 px-6 reveal">
+      <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">Client Words</p>
+      <h2 class="text-4xl md:text-5xl font-bold">Testimonials</h2>
+    </div>
+    <div class="marquee gap-6" id="testimonialTrack"></div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-32 px-6 md:px-10 max-w-4xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">Questions</p>
+      <h2 class="text-4xl md:text-5xl font-bold">Frequently Asked</h2>
+    </div>
+    <div id="faqList" class="flex flex-col gap-4"></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section-relative py-32 px-6 md:px-10 max-w-7xl mx-auto">
+    <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=60');"></div>
+    <div class="grid md:grid-cols-2 gap-14">
+      <div class="reveal">
+        <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">Get In Touch</p>
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">Let's Build Something Great.</h2>
+        <p class="text-gray-400 mb-10 leading-relaxed">Tell us about your project and we'll get back to you within 24 hours with next steps.</p>
+        <div class="flex flex-col gap-5 text-gray-300">
+          <div class="flex items-center gap-4"><span class="w-10 h-10 rounded-full glass flex items-center justify-center">✉</span> hello@novaraagency.com</div>
+          <div class="flex items-center gap-4"><span class="w-10 h-10 rounded-full glass flex items-center justify-center">☏</span> +91 00000 00000</div>
+          <div class="flex items-center gap-4"><span class="w-10 h-10 rounded-full glass flex items-center justify-center">◎</span> WhatsApp: +91 00000 00000</div>
+        </div>
+        <div class="mt-10 rounded-2xl overflow-hidden glass h-56 flex items-center justify-center text-gray-600 text-sm">
+          Google Maps Embed Placeholder
+        </div>
+      </div>
+      <form id="contactForm" class="glass rounded-3xl p-8 flex flex-col gap-5 reveal">
+        <div class="grid sm:grid-cols-2 gap-5">
+          <input required type="text" placeholder="Full Name" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+          <input required type="email" placeholder="Email Address" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+        </div>
+        <input type="text" placeholder="Phone Number" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+        <select class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm text-gray-400">
+          <option>Service Interested In</option>
+          <option>Web Development</option><option>Digital Marketing</option><option>SEO</option>
+          <option>Branding</option><option>Lead Generation</option><option>Real Estate Marketing</option>
+        </select>
+        <textarea required placeholder="Tell us about your project" rows="4" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm resize-none"></textarea>
+        <button type="submit" class="magnetic-btn rounded-full px-8 py-4 border border-white text-sm font-medium mt-2">
+          <span class="fill"></span><span class="label">Send Message</span>
+        </button>
+        <p id="formMsg" class="text-xs text-gray-500"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- BLOG PREVIEW -->
+  <section class="py-24 px-6 md:px-10 max-w-7xl mx-auto border-t border-white/10">
+    <div class="flex items-end justify-between mb-12 reveal">
+      <h2 class="text-3xl md:text-4xl font-bold">From the Blog</h2>
+      <a href="#" class="text-sm text-gray-400 hover:text-white nav-link">View all</a>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <article class="glass rounded-2xl p-6 reveal hover:-translate-y-1 transition">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-3">SEO</p>
+        <h3 class="font-semibold text-lg mb-2">5 SEO Fundamentals Every Real Estate Site Needs</h3>
+        <p class="text-sm text-gray-500">A practical breakdown of on-page SEO for property listings and local search.</p>
+      </article>
+      <article class="glass rounded-2xl p-6 reveal hover:-translate-y-1 transition">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-3">Marketing</p>
+        <h3 class="font-semibold text-lg mb-2">Why Most Lead Generation Funnels Leak Money</h3>
+        <p class="text-sm text-gray-500">The three most common funnel mistakes — and how we fix them for clients.</p>
+      </article>
+      <article class="glass rounded-2xl p-6 reveal hover:-translate-y-1 transition">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-3">Design</p>
+        <h3 class="font-semibold text-lg mb-2">The Anatomy of a High-Converting Landing Page</h3>
+        <p class="text-sm text-gray-500">What separates landing pages that convert from ones that just look pretty.</p>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 py-16 px-6 md:px-10 relative z-10">
+  <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-10">
+    <div>
+      <h3 class="text-xl font-bold tracking-widest mb-4">NOVARA<span class="text-gray-500">.</span></h3>
+      <p class="text-gray-500 text-sm leading-relaxed">A premium digital agency building websites and growth systems for ambitious brands.</p>
+    </div>
+    <div>
+      <h4 class="text-sm font-semibold uppercase tracking-wide mb-4 text-gray-300">Quick Links</h4>
+      <ul class="flex flex-col gap-2 text-sm text-gray-500">
+        <li><a href="#about" class="hover:text-white">About</a></li>
+        <li><a href="#portfolio" class="hover:text-white">Portfolio</a></li>
+        <li><a href="#team" class="hover:text-white">Team</a></li>
+        <li><a href="#contact" class="hover:text-white">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-sm font-semibold uppercase tracking-wide mb-4 text-gray-300">Services</h4>
+      <ul class="flex flex-col gap-2 text-sm text-gray-500">
+        <li><a href="#services" class="hover:text-white">Web Development</a></li>
+        <li><a href="#services" class="hover:text-white">SEO Optimization</a></li>
+        <li><a href="#services" class="hover:text-white">Branding</a></li>
+        <li><a href="#services" class="hover:text-white">Real Estate Marketing</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-sm font-semibold uppercase tracking-wide mb-4 text-gray-300">Connect</h4>
+      <ul class="flex flex-col gap-2 text-sm text-gray-500">
+        <li><a href="#" class="hover:text-white">Instagram</a></li>
+        <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+        <li><a href="#" class="hover:text-white">Twitter / X</a></li>
+        <li><a href="#" class="hover:text-white">WhatsApp</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto border-t border-white/10 mt-12 pt-6 text-center text-xs text-gray-600">
+    © 2026 Novara Agency. All rights reserved.
+  </div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/910000000000" target="_blank" class="wa-float w-14 h-14 rounded-full glass-strong flex items-center justify-center text-2xl hover:scale-110 transition">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.85.5 3.58 1.45 5.07L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.6 14.07c-.24.67-1.4 1.28-1.93 1.36-.49.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.65-.6-2.9-1.25-4.79-4.17-4.93-4.36-.15-.19-1.18-1.57-1.18-3 0-1.42.74-2.12 1-2.41.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.18.01.42-.07.65.5.24.58.81 2 .88 2.14.07.15.12.32.02.51-.1.19-.15.31-.3.48-.15.17-.31.38-.45.51-.15.15-.3.31-.13.61.17.3.78 1.28 1.67 2.07 1.15 1.03 2.12 1.35 2.42 1.5.3.15.48.13.65-.05.18-.18.74-.86.94-1.16.2-.3.4-.25.66-.15.27.1 1.71.81 2 .96.3.15.49.22.56.34.07.13.07.74-.17 1.41z"/></svg>
+</a>
+
+<!-- BACK TO TOP -->
+<button id="bttBtn" class="btt w-12 h-12 rounded-full glass-strong flex items-center justify-center hover:scale-110 transition">↑</button>
+
+<!-- COOKIE -->
+<div id="cookieBar" class="cookie glass-strong p-6 md:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+  <p class="text-sm text-gray-300">We use cookies to enhance your experience on our site. By continuing, you agree to our use of cookies.</p>
+  <div class="flex gap-3 shrink-0">
+    <button id="cookieAccept" class="magnetic-btn rounded-full px-6 py-2.5 border border-white text-sm"><span class="fill"></span><span class="label">Accept</span></button>
+    <button id="cookieDecline" class="rounded-full px-6 py-2.5 border border-white/20 text-sm text-gray-400">Decline</button>
+  </div>
+</div>
+
+<!-- LEAD CAPTURE POPUP -->
+<div id="leadPopup" class="fixed inset-0 z-[250] hidden items-center justify-center px-6">
+  <div id="leadOverlay" class="absolute inset-0 bg-black/85 backdrop-blur-sm"></div>
+  <div id="leadCard" class="relative glass-strong rounded-3xl max-w-md w-full p-8 md:p-10 opacity-0 scale-95">
+    <button id="leadClose" class="absolute top-5 right-5 w-9 h-9 rounded-full border border-white/20 flex items-center justify-center">✕</button>
+    <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-3">Before You Go Further</p>
+    <h3 class="text-2xl font-bold mb-3">Get a Free Growth Consultation</h3>
+    <p class="text-gray-400 text-sm leading-relaxed mb-6">Leave your details and our team will reach out with ideas tailored to your business — no obligation.</p>
+    <form id="leadForm" class="flex flex-col gap-4">
+      <input required type="text" placeholder="Full Name" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+      <input required type="email" placeholder="Email Address" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+      <input type="tel" placeholder="Phone Number" class="rounded-xl border border-white/10 px-4 py-3.5 outline-none focus:border-white/40 text-sm">
+      <button type="submit" class="magnetic-btn rounded-full px-8 py-4 border border-white text-sm font-medium mt-1">
+        <span class="fill"></span><span class="label">Submit</span>
+      </button>
+    </form>
+    <p id="leadMsg" class="text-xs text-gray-500 mt-3"></p>
+    <button id="leadSkip" class="text-xs text-gray-600 hover:text-gray-400 mt-4 underline">No thanks, just browsing</button>
+  </div>
+</div>
+
+<!-- PORTFOLIO MODAL -->
+<div id="modal" class="fixed inset-0 z-[200] hidden items-center justify-center px-6">
+  <div id="modalOverlay" class="absolute inset-0 bg-black/85 backdrop-blur-sm"></div>
+  <div id="modalCard" class="relative glass-strong rounded-3xl max-w-2xl w-full p-8 md:p-10 opacity-0 scale-95">
+    <button id="modalClose" class="absolute top-5 right-5 w-9 h-9 rounded-full border border-white/20 flex items-center justify-center">✕</button>
+    <p id="modalCat" class="text-xs tracking-[0.3em] text-gray-500 uppercase mb-3"></p>
+    <h3 id="modalTitle" class="text-3xl font-bold mb-4"></h3>
+    <p id="modalDesc" class="text-gray-400 leading-relaxed mb-6"></p>
+    <div id="modalTags" class="flex flex-wrap gap-2"></div>
+  </div>
+</div>
+
+<script>
+/* ====================== DATA ====================== */
+const services = [
+  ["Website Development","Custom, high-performance websites built for speed, scale and conversion."],
+  ["E-commerce Development","Full-featured online stores designed to sell more, faster."],
+  ["UI/UX Design","Interfaces that feel premium and guide users to take action."],
+  ["SEO Optimization","Technical & content SEO that gets you found on Google."],
+  ["Google Ads","High-intent paid search campaigns engineered for ROI."],
+  ["Meta Ads","Facebook & Instagram campaigns that turn scrollers into customers."],
+  ["Social Media Management","Consistent, on-brand content that builds real audiences."],
+  ["Branding","Identity systems — logo, voice and visuals — that stand out."],
+  ["Website Maintenance","Ongoing updates, security and performance monitoring."],
+  ["Real Estate Digital Marketing","Targeted campaigns built specifically for property sales."],
+  ["Property Landing Pages","High-converting pages for individual listings & launches."],
+  ["Lead Generation","Funnels and systems that turn traffic into qualified leads."],
+];
+const icons = ["◧","◨","◩","◪","✦","✧","◆","◇","⬡","⌂","⬢","⟡"];
+
+const portfolioData = [
+  {title:"Halcyon Capital", cat:"Business", desc:"A corporate website redesign for a finance firm focused on trust and clarity.", tags:["Web Design","Branding"]},
+  {title:"Meridian Living", cat:"Real Estate", desc:"Property showcase platform with virtual tours and lead capture.", tags:["Real Estate","Lead Gen"]},
+  {title:"Crust & Co.", cat:"Restaurant", desc:"Online ordering experience with a bold, appetite-driving visual identity.", tags:["E-commerce","UI/UX"]},
+  {title:"Vitalis Clinic", cat:"Healthcare", desc:"Appointment-ready healthcare website with accessibility at its core.", tags:["Web Design","SEO"]},
+  {title:"Orbit Apparel", cat:"E-commerce", desc:"A full Shopify rebuild that lifted conversion rate by 38%.", tags:["E-commerce","CRO"]},
+  {title:"Studio Renne", cat:"Portfolio", desc:"Minimal portfolio site for an architecture studio.", tags:["Portfolio","Branding"]},
+  {title:"Northwell Estates", cat:"Real Estate", desc:"Property landing page series generating qualified buyer leads.", tags:["Landing","Real Estate"]},
+  {title:"Primeroot Launch", cat:"Landing", desc:"Product launch landing page with animated storytelling.", tags:["Landing","Animation"]},
+  {title:"Atlas Group", cat:"Business", desc:"Investor-facing corporate site with dynamic data visualizations.", tags:["Web Design","Dev"]},
+];
+
+const testimonials = [
+  ["Working with Novara felt like having an in-house team. Our new site converts almost 3x better.","— Founder, Halcyon Capital"],
+  ["They understood our real estate listings business immediately. Leads doubled in 60 days.","— Director, Meridian Living"],
+  ["Premium design, fast delivery, and a team that actually explains the strategy behind every decision.","— CMO, Orbit Apparel"],
+  ["The SEO work alone paid for the entire project within the first quarter.","— Owner, Vitalis Clinic"],
+  ["Best agency we've used. Period. Communicative, sharp, and obsessed with results.","— Founder, Primeroot"],
+];
+
+const faqs = [
+  ["How long does a typical website project take?","Most websites take 3–6 weeks from kickoff to launch, depending on scope. E-commerce and custom web apps can take longer."],
+  ["Do you offer ongoing marketing support after launch?","Yes — we offer monthly SEO, ads management and maintenance retainers so your growth continues after launch."],
+  ["Can you work specifically with real estate businesses?","Absolutely. Real estate marketing and property landing pages are one of our core specialties."],
+  ["What's included in your lead generation service?","Funnel strategy, landing pages, ad creative, tracking setup and ongoing optimization based on real conversion data."],
+  ["Do you provide pricing packages?","Yes, we have tiered packages for startups, growing businesses and enterprises — reach out and we'll recommend the right fit."],
+];
+
+/* ====================== RENDER ====================== */
+const svGrid = document.getElementById('servicesGrid');
+services.forEach((s,i)=>{
+  svGrid.innerHTML += `
+  <div class="service-card reveal glass rounded-2xl p-7 hover:-translate-y-2 hover:border-white/30" style="box-shadow:0 0 0 rgba(255,255,255,0)">
+    <div class="text-3xl mb-5 opacity-80">${icons[i]}</div>
+    <h3 class="text-lg font-semibold mb-2">${s[0]}</h3>
+    <p class="text-sm text-gray-500 leading-relaxed">${s[1]}</p>
+  </div>`;
+});
+
+const pfGrid = document.getElementById('portfolioGrid');
+function renderPortfolio(filter){
+  pfGrid.innerHTML = "";
+  portfolioData.filter(p=> filter==='all' || p.cat===filter).forEach((p,i)=>{
+    pfGrid.innerHTML += `
+    <div class="portfolio-card tilt-wrap reveal glass rounded-2xl overflow-hidden cursor-pointer group" data-index="${portfolioData.indexOf(p)}">
+      <div class="h-52 flex items-center justify-center text-5xl text-gray-700 bg-gradient-to-br from-[#0d0d0d] to-[#000] group-hover:from-[#161616] transition">${icons[i%icons.length]}</div>
+      <div class="p-6">
+        <p class="text-xs text-gray-500 uppercase tracking-widest mb-2">${p.cat}</p>
+        <h3 class="font-semibold text-lg">${p.title}</h3>
+      </div>
+    </div>`;
+  });
+  document.querySelectorAll('.portfolio-card').forEach(card=>{
+    card.addEventListener('click', ()=> openModal(portfolioData[card.dataset.index]));
+    card.addEventListener('mousemove', tiltMove);
+    card.addEventListener('mouseleave', tiltLeave);
+  });
+  gsap.utils.toArray('.portfolio-card').forEach(el=>{
+    gsap.fromTo(el, {opacity:0, y:40}, {opacity:1, y:0, duration:.6, ease:'power3.out',
+      scrollTrigger:{trigger:el, start:'top 90%'}});
+  });
+}
+renderPortfolio('all');
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active','bg-white','text-black'));
+    btn.classList.add('active','bg-white','text-black');
+    renderPortfolio(btn.dataset.filter);
+  });
+});
+document.querySelector('.filter-btn[data-filter="all"]').classList.add('bg-white','text-black');
+
+function tiltMove(e){
+  const card = e.currentTarget, r = card.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  const rx = ((y / r.height) - .5) * -10, ry = ((x / r.width) - .5) * 10;
+  card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+}
+function tiltLeave(e){ e.currentTarget.style.transform = 'rotateX(0) rotateY(0) translateY(0)'; }
+
+const modal = document.getElementById('modal');
+function openModal(p){
+  document.getElementById('modalCat').textContent = p.cat;
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalDesc').textContent = p.desc;
+  document.getElementById('modalTags').innerHTML = p.tags.map(t=>`<span class="text-xs border border-white/20 rounded-full px-3 py-1 text-gray-400">${t}</span>`).join('');
+  modal.classList.remove('hidden'); modal.classList.add('flex');
+  gsap.fromTo('#modalCard',{opacity:0,scale:.94,y:20},{opacity:1,scale:1,y:0,duration:.5,ease:'power3.out'});
+}
+function closeModal(){
+  gsap.to('#modalCard',{opacity:0,scale:.94,y:20,duration:.3,onComplete:()=>{modal.classList.add('hidden');modal.classList.remove('flex');}});
+}
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', closeModal);
+
+const track = document.getElementById('testimonialTrack');
+[...testimonials, ...testimonials].forEach(t=>{
+  track.innerHTML += `
+  <div class="glass rounded-2xl p-7 w-80 shrink-0">
+    <div class="text-2xl mb-4 text-gray-500">"</div>
+    <p class="text-gray-300 text-sm leading-relaxed mb-5">${t[0]}</p>
+    <p class="text-xs text-gray-500 tracking-wide">${t[1]}</p>
+  </div>`;
+});
+
+const faqList = document.getElementById('faqList');
+faqs.forEach((f,i)=>{
+  faqList.innerHTML += `
+  <div class="glass rounded-2xl reveal overflow-hidden faq-item">
+    <button class="faq-btn w-full flex items-center justify-between text-left px-6 py-5">
+      <span class="font-medium">${f[0]}</span>
+      <span class="faq-icon text-gray-500 text-xl transition-transform duration-300">+</span>
+    </button>
+    <div class="accordion-content px-6">
+      <p class="text-gray-500 text-sm pb-5 leading-relaxed">${f[1]}</p>
+    </div>
+  </div>`;
+});
+document.querySelectorAll('.faq-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const content = btn.nextElementSibling, icon = btn.querySelector('.faq-icon');
+    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+    document.querySelectorAll('.accordion-content').forEach(c=>c.style.maxHeight='0px');
+    document.querySelectorAll('.faq-icon').forEach(i=>i.style.transform='rotate(0deg)');
+    if(!isOpen){ content.style.maxHeight = content.scrollHeight+'px'; icon.style.transform='rotate(45deg)'; }
+  });
+});
+
+/* ====================== LOADER ====================== */
+window.addEventListener('load', ()=>{
+  let p = 0;
+  const pct = document.getElementById('loader-pct');
+  const interval = setInterval(()=>{
+    p += Math.random()*18;
+    if(p>=100){ p=100; clearInterval(interval); }
+    pct.textContent = `Loading ${Math.floor(p)}%`;
+  }, 120);
+
+  gsap.to('#loader-text', {y:'0%', duration:1.1, ease:'power4.out', delay:.2});
+  gsap.to('#loader', {
+    delay:1.6, duration:.9, ease:'power3.inOut',
+    y:'-100%',
+    onComplete: ()=>{ document.getElementById('loader').remove(); revealHero(); }
+  });
+});
+
+function revealHero(){
+  gsap.to('#home .reveal', {opacity:1, y:0, duration:1, stagger:.12, ease:'power3.out'});
+}
+
+/* ====================== SCROLL REVEALS ====================== */
+gsap.registerPlugin(ScrollTrigger);
+document.querySelectorAll('.reveal').forEach(el=>{
+  if(el.closest('#home')) return;
+  gsap.fromTo(el, {opacity:0, y:50}, {
+    opacity:1, y:0, duration:.9, ease:'power3.out',
+    scrollTrigger:{trigger:el, start:'top 88%'}
+  });
+});
+
+/* process line */
+ScrollTrigger.create({
+  trigger:'#process', start:'top 70%', end:'bottom 80%', scrub:true,
+  onUpdate: self => { document.getElementById('processLine').style.width = (self.progress*100)+'%'; }
+});
+
+/* counters */
+document.querySelectorAll('.counter').forEach(c=>{
+  ScrollTrigger.create({
+    trigger:c, start:'top 90%', once:true,
+    onEnter:()=>{
+      const target = +c.dataset.target;
+      gsap.to(c, { innerText: target, duration:1.8, snap:'innerText', ease:'power2.out',
+        onUpdate(){ c.innerText = Math.floor(c.innerText); } });
+    }
+  });
+});
+
+/* ====================== LENIS SMOOTH SCROLL ====================== */
+/* ====================== LENIS FAST SMOOTH SCROLL ====================== */
+const lenis = new Lenis({
+  duration: 0.3,          // Lower = faster
+  smoothWheel: true,
+  wheelMultiplier: 3,   // Increase scroll speed
+  touchMultiplier: 2,
+  lerp: 0.12              // Makes scrolling more responsive
+});
+
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+lenis.on('scroll', ScrollTrigger.update);
+
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+});
+
+gsap.ticker.lagSmoothing(0);
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const id = a.getAttribute('href');
+
+    if (id.length > 1) {
+      lenis.scrollTo(id, {
+        offset: -60,
+        duration: 0.6 // Faster section navigation
+      });
+    }
+
+    document.getElementById('mobileMenu').classList.add('hidden');
+  });
+});
+
+/* scroll progress bar */
+lenis.on('scroll', ()=>{
+  const max = document.body.scrollHeight - window.innerHeight;
+  const sc = window.scrollY || document.documentElement.scrollTop;
+  document.getElementById('progressBar').style.width = (sc/max*100)+'%';
+  document.getElementById('bttBtn').classList.toggle('show', sc>600);
+  document.getElementById('navbar').classList.toggle('glass-strong', sc>40);
+});
+document.getElementById('bttBtn').addEventListener('click', ()=> lenis.scrollTo(0));
+
+/* mobile menu */
+const menuBtn = document.getElementById('menuBtn'), mobileMenu = document.getElementById('mobileMenu');
+menuBtn.addEventListener('click', ()=>{
+  mobileMenu.classList.toggle('hidden'); mobileMenu.classList.toggle('flex');
+});
+
+/* cookie consent */
+const cookieBar = document.getElementById('cookieBar');
+if(!localStorage.getItem('novara_cookie')){
+  setTimeout(()=> cookieBar.classList.add('show'), 1500);
+}
+document.getElementById('cookieAccept').addEventListener('click', ()=>{ localStorage.setItem('novara_cookie','accepted'); cookieBar.classList.remove('show'); });
+document.getElementById('cookieDecline').addEventListener('click', ()=>{ localStorage.setItem('novara_cookie','declined'); cookieBar.classList.remove('show'); });
+
+/* lead capture popup — fires once on first scroll, remembered via cookie/localStorage */
+function setCookie(name,value,days){
+  const d = new Date(); d.setTime(d.getTime()+days*24*60*60*1000);
+  document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+}
+function getCookie(name){
+  return document.cookie.split('; ').find(r=>r.startsWith(name+'='))?.split('=')[1];
+}
+const leadPopup = document.getElementById('leadPopup');
+let leadShown = false;
+function showLeadPopup(){
+  if(leadShown) return;
+  if(localStorage.getItem('novara_lead_seen') || getCookie('novara_lead_seen')) return;
+  leadShown = true;
+  leadPopup.classList.remove('hidden'); leadPopup.classList.add('flex');
+  gsap.fromTo('#leadCard',{opacity:0,scale:.94,y:20},{opacity:1,scale:1,y:0,duration:.5,ease:'power3.out'});
+}
+function closeLeadPopup(remember){
+  gsap.to('#leadCard',{opacity:0,scale:.94,y:20,duration:.3,onComplete:()=>{leadPopup.classList.add('hidden');leadPopup.classList.remove('flex');}});
+  if(remember){ localStorage.setItem('novara_lead_seen','1'); setCookie('novara_lead_seen','1',365); }
+}
+let scrollTriggeredOnce = false;
+lenis.on('scroll', ()=>{
+  if(!scrollTriggeredOnce && window.scrollY > 200){
+    scrollTriggeredOnce = true;
+    setTimeout(showLeadPopup, 400);
+  }
+});
+document.getElementById('leadClose').addEventListener('click', ()=> closeLeadPopup(true));
+document.getElementById('leadOverlay').addEventListener('click', ()=> closeLeadPopup(true));
+document.getElementById('leadSkip').addEventListener('click', ()=> closeLeadPopup(true));
+document.getElementById('leadForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  document.getElementById('leadMsg').textContent = "Thanks! We'll reach out shortly.";
+  setTimeout(()=> closeLeadPopup(true), 900);
+});
+
+/* contact form (frontend only — wire up EmailJS endpoint here) */
+document.getElementById('contactForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  document.getElementById('formMsg').textContent = "Thanks! Your message has been received — we'll be in touch within 24 hours.";
+  e.target.reset();
+});
+
+/* ====================== CUSTOM CURSOR ====================== */
+const dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring'), glow = document.getElementById('cursor-glow');
+let mx=innerWidth/2,my=innerHeight/2, rx=mx, ry=my;
+window.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  dot.style.left=mx+'px'; dot.style.top=my+'px';
+  glow.style.left=mx+'px'; glow.style.top=my+'px';
+});
+(function loop(){ rx += (mx-rx)*.18; ry += (my-ry)*.18; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loop); })();
+document.querySelectorAll('a,button,.faq-btn,.filter-btn').forEach(el=>{
+  el.addEventListener('mouseenter', ()=>document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', ()=>document.body.classList.remove('cursor-hover'));
+});
+window.addEventListener('mousedown', ()=>{ dot.classList.add('click'); ring.style.borderColor='rgba(255,255,255,.9)'; });
+window.addEventListener('mouseup', ()=>{ dot.classList.remove('click'); ring.style.borderColor='rgba(255,255,255,.5)'; });
+window.addEventListener('mouseleave', ()=>{ dot.style.opacity=0; ring.style.opacity=0; glow.style.opacity=0; });
+window.addEventListener('mouseenter', ()=>{ dot.style.opacity=1; ring.style.opacity=1; glow.style.opacity=1; });
+
+/* magnetic buttons */
+document.querySelectorAll('.magnetic-btn').forEach(btn=>{
+  btn.addEventListener('mousemove', e=>{
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width/2, y = e.clientY - r.top - r.height/2;
+    btn.style.transform = `translate(${x*0.25}px, ${y*0.35}px)`;
+  });
+  btn.addEventListener('mouseleave', ()=> btn.style.transform='translate(0,0)');
+});
+
+/* ====================== THREE.JS BACKGROUND ====================== */
+const canvas = document.getElementById('webgl-bg');
+const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 1000);
+camera.position.z = 18;
+
+const group = new THREE.Group();
+scene.add(group);
+
+const wireMat = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.18});
+const solidMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.04, wireframe:false});
+
+function addWire(geo, x,y,z, s){
+  const edges = new THREE.EdgesGeometry(geo);
+  const mesh = new THREE.LineSegments(edges, wireMat);
+  mesh.position.set(x,y,z); mesh.scale.setScalar(s);
+  group.add(mesh); return mesh;
+}
+
+const shapes = [];
+shapes.push(addWire(new THREE.BoxGeometry(2,2,2), -8,3,-4, 1.4));
+shapes.push(addWire(new THREE.BoxGeometry(1.4,1.4,1.4), 7,-2,-2, 1.2));
+shapes.push(addWire(new THREE.IcosahedronGeometry(1.6,0), 9,4,-6, 1));
+shapes.push(addWire(new THREE.OctahedronGeometry(1.4,0), -9,-3,-3, 1));
+shapes.push(addWire(new THREE.TorusGeometry(1.6,0.06,8,40), 4,5,-8, 1.4));
+shapes.push(addWire(new THREE.TorusGeometry(2.2,0.05,8,40), -5,-5,-7, 1.2));
+shapes.push(addWire(new THREE.BoxGeometry(1,1,1), 0,6,-10, 1));
+shapes.push(addWire(new THREE.IcosahedronGeometry(1,0), -2,-6,-5, 1));
+
+/* particle system */
+const particleCount = 600;
+const positions = new Float32Array(particleCount*3);
+for(let i=0;i<particleCount;i++){
+  positions[i*3] = (Math.random()-0.5)*60;
+  positions[i*3+1] = (Math.random()-0.5)*60;
+  positions[i*3+2] = (Math.random()-0.5)*40 - 10;
+}
+const particleGeo = new THREE.BufferGeometry();
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const particleMat = new THREE.PointsMaterial({color:0xffffff, size:0.06, transparent:true, opacity:0.5});
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+let targetX=0, targetY=0;
+window.addEventListener('mousemove', e=>{
+  targetX = (e.clientX/innerWidth - .5) * 2;
+  targetY = (e.clientY/innerHeight - .5) * 2;
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  shapes.forEach((m,i)=>{
+    m.rotation.x += 0.0018 + i*0.0001;
+    m.rotation.y += 0.0024 + i*0.0001;
+  });
+  particles.rotation.y += 0.0006;
+  camera.position.x += (targetX*2 - camera.position.x)*0.03;
+  camera.position.y += (-targetY*2 - camera.position.y)*0.03;
+  camera.lookAt(0,0,0);
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
