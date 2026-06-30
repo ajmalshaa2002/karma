@@ -115,7 +115,7 @@
 <!-- NAV -->
 <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
   <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between py-5">
-    <a href="#home" class="text-xl font-bold tracking-[0.15em] data-magnetic">NOVARA<span class="text-gray-500">.</span></a>
+    <a href="#home" class="text-xl font-bold tracking-[0.15em] data-magnetic">KARMA<span class="text-gray-500">.</span></a>
     <nav class="hidden lg:flex items-center gap-9 text-sm text-gray-300">
       <a href="#home" class="nav-link">Home</a>
       <a href="#about" class="nav-link">About</a>
@@ -183,11 +183,11 @@
     <div class="section-bg" style="background-image:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=60');"></div>
     <div class="grid md:grid-cols-12 gap-12">
       <div class="md:col-span-5 reveal">
-        <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">About Novara</p>
+        <p class="text-xs tracking-[0.4em] text-gray-500 uppercase mb-4">About KARMA</p>
         <h2 class="text-4xl md:text-5xl font-bold leading-tight">We exist to make great businesses <span class="text-gray-500">impossible to ignore.</span></h2>
       </div>
       <div class="md:col-span-7 flex flex-col gap-6 text-gray-400 text-lg leading-relaxed reveal">
-        <p>Novara was founded on a simple belief: most businesses don't lose to better competitors — they lose to better-marketed ones. We started as a two-person team obsessed with the intersection of design, code and conversion, and grew into a full-stack digital partner for ambitious brands.</p>
+        <p>KARMA was founded on a simple belief: most businesses don't lose to better competitors — they lose to better-marketed ones. We started as a two-person team obsessed with the intersection of design, code and conversion, and grew into a full-stack digital partner for ambitious brands.</p>
         <p>Today we combine modern web technology with data-driven marketing to help our clients win attention, build trust and turn visitors into paying customers. Every project we take on is treated as if it were our own business — because your growth is our scoreboard.</p>
         <div class="grid grid-cols-2 gap-6 mt-4">
           <div class="glass rounded-2xl p-6">
@@ -523,7 +523,7 @@ const portfolioData = [
 ];
 
 const testimonials = [
-  ["Working with Novara felt like having an in-house team. Our new site converts almost 3x better.","— Founder, Halcyon Capital"],
+  ["Working with Karma felt like having an in-house team. Our new site converts almost 3x better.","— Founder, Halcyon Capital"],
   ["They understood our real estate listings business immediately. Leads doubled in 60 days.","— Director, Meridian Living"],
   ["Premium design, fast delivery, and a team that actually explains the strategy behind every decision.","— CMO, Orbit Apparel"],
   ["The SEO work alone paid for the entire project within the first quarter.","— Owner, Vitalis Clinic"],
@@ -748,11 +748,11 @@ menuBtn.addEventListener('click', ()=>{
 
 /* cookie consent */
 const cookieBar = document.getElementById('cookieBar');
-if(!localStorage.getItem('novara_cookie')){
+  if(!localStorage.getItem('karma_cookie')){
   setTimeout(()=> cookieBar.classList.add('show'), 1500);
 }
-document.getElementById('cookieAccept').addEventListener('click', ()=>{ localStorage.setItem('novara_cookie','accepted'); cookieBar.classList.remove('show'); });
-document.getElementById('cookieDecline').addEventListener('click', ()=>{ localStorage.setItem('novara_cookie','declined'); cookieBar.classList.remove('show'); });
+  document.getElementById('cookieAccept').addEventListener('click', ()=>{ localStorage.setItem('karma_cookie','accepted'); cookieBar.classList.remove('show'); });
+  document.getElementById('cookieDecline').addEventListener('click', ()=>{ localStorage.setItem('karma_cookie','declined'); cookieBar.classList.remove('show'); });
 
 /* lead capture popup — fires once on first scroll, remembered via cookie/localStorage */
 function setCookie(name,value,days){
@@ -766,14 +766,14 @@ const leadPopup = document.getElementById('leadPopup');
 let leadShown = false;
 function showLeadPopup(){
   if(leadShown) return;
-  if(localStorage.getItem('novara_lead_seen') || getCookie('novara_lead_seen')) return;
+  if(localStorage.getItem('karma_lead_seen') || getCookie('karma_lead_seen')) return;
   leadShown = true;
   leadPopup.classList.remove('hidden'); leadPopup.classList.add('flex');
   gsap.fromTo('#leadCard',{opacity:0,scale:.94,y:20},{opacity:1,scale:1,y:0,duration:.5,ease:'power3.out'});
 }
 function closeLeadPopup(remember){
   gsap.to('#leadCard',{opacity:0,scale:.94,y:20,duration:.3,onComplete:()=>{leadPopup.classList.add('hidden');leadPopup.classList.remove('flex');}});
-  if(remember){ localStorage.setItem('novara_lead_seen','1'); setCookie('novara_lead_seen','1',365); }
+  if(remember){ localStorage.setItem('karma_lead_seen','1'); setCookie('karma_lead_seen','1',365); }
 }
 let scrollTriggeredOnce = false;
 lenis.on('scroll', ()=>{
